@@ -31,11 +31,11 @@ public class GeneratorDialog extends JDialog {
     private final Setting setting;
 
     private JPanel contentPane;
-    private JButton buttonOK;
-    private JButton buttonCancel;
+    private JButton generate;
+    private JButton cancel;
     private JTextArea jsonTextArea;
-    private JTextField classNameField;
-    private JButton buttonSettings;
+    private JTextField className;
+    private JButton settings;
 
     public GeneratorDialog(Project project, String packageName, VirtualFile actionFolder) {
         this.project = project;
@@ -46,7 +46,7 @@ public class GeneratorDialog extends JDialog {
 
         setContentPane(contentPane);
         setModal(true);
-        getRootPane().setDefaultButton(buttonOK);
+        getRootPane().setDefaultButton(generate);
         setLocation(setting.getWindowX(), setting.getWindowY());
         setSize(setting.getWindowWidth(), setting.getWindowHeight());
         setMinimumSize(new Dimension(420, 400));
@@ -67,9 +67,9 @@ public class GeneratorDialog extends JDialog {
             }
         });
 
-        buttonOK.addActionListener(e -> onOK());
-        buttonCancel.addActionListener(e -> onCancel());
-        buttonSettings.addActionListener(e -> {
+        generate.addActionListener(e -> onOK());
+        cancel.addActionListener(e -> onCancel());
+        settings.addActionListener(e -> {
             SettingDialog dialog = new SettingDialog();
             dialog.setTitle("settings");
             dialog.setLocationRelativeTo(this);
@@ -87,7 +87,7 @@ public class GeneratorDialog extends JDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         );
 
-        buttonOK.setEnabled(false);
+        generate.setEnabled(false);
         final DocumentListener documentListener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
@@ -105,12 +105,12 @@ public class GeneratorDialog extends JDialog {
             }
 
             private void validate() {
-                buttonOK.setEnabled(
-                        Utils.isValidClassName(classNameField.getText()) && Utils.isJsonObject(jsonTextArea.getText())
+                generate.setEnabled(
+                        Utils.isValidClassName(className.getText()) && Utils.isJsonObject(jsonTextArea.getText())
                 );
             }
         };
-        classNameField.getDocument().addDocumentListener(documentListener);
+        className.getDocument().addDocumentListener(documentListener);
         jsonTextArea.getDocument().addDocumentListener(documentListener);
 
         try {
@@ -133,7 +133,7 @@ public class GeneratorDialog extends JDialog {
                                 .setClassAnnotations(setting.getClassAnnotations())
                                 .isPrimitiveFields(setting.isFieldTypePrimitive())
                                 .build()
-                                .apply(jsonTextArea.getText(), classNameField.getText());
+                                .apply(jsonTextArea.getText(), className.getText());
                         ProjectView.getInstance(project).refresh();
                         actionFolder.refresh(false, true);
                     }

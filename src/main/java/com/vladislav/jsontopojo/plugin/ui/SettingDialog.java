@@ -30,6 +30,11 @@ public class SettingDialog extends JDialog {
     private JCheckBox lombokSetter;
     private JCheckBox lombokSetterOnClass;
     private JCheckBox lombokGetterOnClass;
+    private JRadioButton vanillaJsonToPojo;
+    private JRadioButton lombokJsonToPojo;
+    private JCheckBox useFinalFieldsCheckBox;
+    private JPanel vanillaSettings;
+    private JPanel lombokSettings;
 
     private final Setting setting = Setting.getInstance();
 
