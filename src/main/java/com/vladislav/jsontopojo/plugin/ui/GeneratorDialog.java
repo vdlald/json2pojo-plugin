@@ -131,14 +131,14 @@ public class GeneratorDialog extends JDialog {
                     public void run(@NotNull ProgressIndicator indicator) {
                         if (setting.isLombokJsonToPojo()) {
                             JsonToLombokPojo.newBuilder(destinationPath, packageName, indicator)
-                                    .setFieldAnnotations(Settings.getFieldAnnotation(setting))
+                                    .setFieldAnnotations(Settings.getFieldAnnotations(setting))
                                     .setClassAnnotations(Settings.getClassAnnotations(setting))
                                     .setPrimitiveFields(setting.isUsePrimitiveTypes())
                                     .build()
                                     .apply(jsonTextArea.getText(), className.getText());
                         } else {
                             JsonToVanillaPojo.newBuilder(destinationPath, packageName, indicator)
-                                    .setFieldAnnotations(Settings.getFieldAnnotation(setting))
+                                    .setFieldAnnotations(Settings.getFieldAnnotations(setting))
                                     .setClassAnnotations(Settings.getClassAnnotations(setting))
                                     .setPrimitiveFields(setting.isUsePrimitiveTypes())
                                     .setCreateGetters(setting.isVanillaGetters())

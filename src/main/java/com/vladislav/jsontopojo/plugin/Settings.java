@@ -33,7 +33,7 @@ public class Settings {
         return Collections.unmodifiableSet(annotations);
     }
 
-    public Set<Class<? extends Annotation>> getFieldAnnotation(Setting setting) {
+    public Set<Class<? extends Annotation>> getFieldAnnotations(Setting setting) {
         return new HashSet<>() {{
             if (setting.getAnnotateDeserializeFieldWith() == 0) {
                 add(SerializedName.class);
