@@ -19,6 +19,7 @@ public class JsonToLombokPojo extends AbstractJsonToPojo {
         super(
                 builder.classAnnotations,
                 builder.fieldAnnotations,
+                builder.deserializeAnnotation,
                 builder.fieldFactory,
                 builder.packageName,
                 builder.destinationPath,
@@ -50,6 +51,7 @@ public class JsonToLombokPojo extends AbstractJsonToPojo {
         private Set<Class<? extends Annotation>> fieldAnnotations;
         private Set<Class<? extends Annotation>> classAnnotations;
         private FieldFactory fieldFactory;
+        private Class<? extends Annotation> deserializeAnnotation;
 
         Builder(
                 @NonNull String destinationPath,
@@ -63,10 +65,16 @@ public class JsonToLombokPojo extends AbstractJsonToPojo {
             fieldFactory = new ClassFieldFactory(model);
             fieldAnnotations = new HashSet<>();
             classAnnotations = new HashSet<>();
+            deserializeAnnotation = null;
         }
 
         public Builder setFieldAnnotations(Set<Class<? extends Annotation>> fieldAnnotations) {
             this.fieldAnnotations = fieldAnnotations;
+            return this;
+        }
+
+        public Builder setDeserializeAnnotation(Class<? extends Annotation> deserializeAnnotation) {
+            this.deserializeAnnotation = deserializeAnnotation;
             return this;
         }
 

@@ -35,11 +35,6 @@ public class Settings {
 
     public Set<Class<? extends Annotation>> getFieldAnnotations(Setting setting) {
         return new HashSet<>() {{
-            if (setting.getAnnotateDeserializeFieldWith() == 0) {
-                add(SerializedName.class);
-            } else if (setting.getAnnotateDeserializeFieldWith() == 1) {
-                add(JsonProperty.class);
-            }
             if (setting.isLombokJsonToPojo()) {
                 if (!setting.isLombokGetterOnClass() && setting.isLombokGetter()) {
                     add(Getter.class);
@@ -49,6 +44,16 @@ public class Settings {
                 }
             }
         }};
+    }
+
+    public Class<? extends Annotation> getDeserializeAnnotation(Setting setting) {
+        if (setting.getAnnotateDeserializeFieldWith() == 1) {
+            return SerializedName.class;
+        } else if (setting.getAnnotateDeserializeFieldWith() == 2) {
+            return JsonProperty.class;
+        } else {
+            return null;
+        }
     }
 
 }

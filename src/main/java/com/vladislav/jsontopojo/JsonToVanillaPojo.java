@@ -1,5 +1,6 @@
 package com.vladislav.jsontopojo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.sun.codemodel.*;
 import com.vladislav.jsontopojo.factories.ClassFieldFactory;
@@ -23,6 +24,7 @@ public class JsonToVanillaPojo extends AbstractJsonToPojo {
         super(
                 builder.classAnnotations,
                 builder.fieldAnnotations,
+                builder.deserializeAnnotation,
                 builder.fieldFactory,
                 builder.packageName,
                 builder.destinationPath,
@@ -60,7 +62,7 @@ public class JsonToVanillaPojo extends AbstractJsonToPojo {
             fields.forEach((fieldName, field) -> {
                 final JMethod method = clazz.method(
                         JMod.PUBLIC,
-                        field.type(),
+                        Void.TYPE,
                         "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1)
                 );
                 method.param(field.type(), fieldName);
@@ -95,6 +97,7 @@ public class JsonToVanillaPojo extends AbstractJsonToPojo {
         private boolean createNoArgsConstructor;
         private boolean createAllArgsConstructor;
         private boolean createFinalFields;
+        private Class<? extends Annotation> deserializeAnnotation;
 
         Builder(
                 @NonNull String destinationPath,
@@ -113,10 +116,16 @@ public class JsonToVanillaPojo extends AbstractJsonToPojo {
             createNoArgsConstructor = true;
             createAllArgsConstructor = true;
             createFinalFields = false;
+            deserializeAnnotation = null;
         }
 
         public Builder setFieldAnnotations(Set<Class<? extends Annotation>> fieldAnnotations) {
             this.fieldAnnotations = fieldAnnotations;
+            return this;
+        }
+
+        public Builder setDeserializeAnnotation(Class<? extends Annotation> deserializeAnnotation) {
+            this.deserializeAnnotation = deserializeAnnotation;
             return this;
         }
 

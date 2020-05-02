@@ -17,13 +17,15 @@ public abstract class AbstractJsonToPojo {
 
     private final Set<Class<? extends Annotation>> classAnnotations;
     private final Set<Class<? extends Annotation>> fieldAnnotations;
+    private final Class<? extends Annotation> deserializeAnnotation;
     private final FieldFactory fieldFactory;
     private final String packageName;
     private final String destinationPath;
     private final int fieldMods;
+    private final JCodeModel codeModel;
 
-    private JCodeModel codeModel;
     private JPackage jPackage;
+    private Set<JDefinedClass> classes;
 
     private final JClass stringRef;
     private final JClass objectRef;
@@ -35,6 +37,7 @@ public abstract class AbstractJsonToPojo {
     public AbstractJsonToPojo(
             Set<Class<? extends Annotation>> classAnnotations,
             Set<Class<? extends Annotation>> fieldAnnotations,
+            Class<? extends Annotation> deserializeAnnotation,
             FieldFactory fieldFactory,
             String packageName,
             String destinationPath,
@@ -43,6 +46,7 @@ public abstract class AbstractJsonToPojo {
     ) {
         this.classAnnotations = classAnnotations;
         this.fieldAnnotations = fieldAnnotations;
+        this.deserializeAnnotation = deserializeAnnotation;
         this.fieldFactory = fieldFactory;
         this.packageName = packageName;
         this.destinationPath = destinationPath;
@@ -58,11 +62,12 @@ public abstract class AbstractJsonToPojo {
 
     public void apply(@NonNull String json, @NonNull String className) {
         final JsonElement jsonElement = JsonParser.parseString(json);
-        codeModel = new JCodeModel();
+        classes = new HashSet<>();
         jPackage = codeModel._package(packageName);
         try {
             parseObject(jsonElement.getAsJsonObject(), className);
             codeModel.build(new File(destinationPath));
+            classes.forEach(jPackage::remove);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -73,6 +78,7 @@ public abstract class AbstractJsonToPojo {
 
         clazz = jPackage._class(formatClassName(className));
         classAnnotations.forEach(clazz::annotate);
+        classes.add(clazz);
 
         jsonObject.entrySet().forEach(entry -> {
             final String key = entry.getKey();
@@ -82,7 +88,11 @@ public abstract class AbstractJsonToPojo {
                 createPrimitiveField(clazz, key, value.getAsJsonPrimitive());
             } else if (value.isJsonObject()) {
                 try {
-                    createField(clazz, parseObject(value.getAsJsonObject(), formatClassName(key)), key);
+                    createField(
+                            clazz,
+                            parseObject(value.getAsJsonObject(), className + formatClassName(key)),
+                            key
+                    );
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -99,7 +109,11 @@ public abstract class AbstractJsonToPojo {
 
     // region Work with Fields
     private void createField(JDefinedClass clazz, JClass ref, String name) {
-        final JFieldVar field = clazz.field(fieldMods, ref, formatFieldName(name));
+        final String formatName = formatFieldName(name);
+        final JFieldVar field = clazz.field(fieldMods, ref, formatName);
+        if (!formatName.equals(name)) {
+            field.annotate(deserializeAnnotation).param("value", name);
+        }
         fieldAnnotations.forEach(field::annotate);
     }
 
@@ -194,7 +208,7 @@ public abstract class AbstractJsonToPojo {
         else if (element.isJsonArray())
             return codeModel.ref(List.class).narrow(getTypeOfJsonArray(element.getAsJsonArray()));
         else
-            return objectRef;
+            return objectRef;  // todo: bug, parse object
     }
 
     private JType getTypeOfJsonArrayPrimitive(JsonPrimitive primitive) {
