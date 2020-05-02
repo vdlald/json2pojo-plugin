@@ -255,7 +255,7 @@
                   <text value="Setters"/>
                 </properties>
               </component>
-              <component id="f8adb" class="javax.swing.JCheckBox" binding="useFinalFieldsCheckBox" default-binding="true">
+              <component id="f8adb" class="javax.swing.JCheckBox" binding="vanillaUseFinalFields">
                 <constraints/>
                 <properties>
                   <text value="Use final fields"/>

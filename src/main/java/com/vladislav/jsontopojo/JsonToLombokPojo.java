@@ -3,6 +3,7 @@ package com.vladislav.jsontopojo;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JMod;
 import com.vladislav.jsontopojo.factories.ClassFieldFactory;
 import com.vladislav.jsontopojo.factories.FieldFactory;
 import com.vladislav.jsontopojo.factories.PrimitiveFieldFactory;
@@ -21,6 +22,7 @@ public class JsonToLombokPojo extends AbstractJsonToPojo {
                 builder.fieldFactory,
                 builder.packageName,
                 builder.destinationPath,
+                JMod.PRIVATE,
                 builder.model
         );
     }
@@ -73,7 +75,7 @@ public class JsonToLombokPojo extends AbstractJsonToPojo {
             return this;
         }
 
-        public Builder isPrimitiveFields(boolean isPrimitive) {
+        public Builder setPrimitiveFields(boolean isPrimitive) {
             if (isPrimitive) {
                 fieldFactory = new PrimitiveFieldFactory(model);
             } else {

@@ -7,8 +7,10 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.vladislav.jsontopojo.JsonToLombokPojo;
+import com.vladislav.jsontopojo.JsonToVanillaPojo;
 import com.vladislav.jsontopojo.Utils;
 import com.vladislav.jsontopojo.plugin.Setting;
+import com.vladislav.jsontopojo.plugin.Settings;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -21,7 +23,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
-import java.util.Set;
 
 public class GeneratorDialog extends JDialog {
     private final Project project;
@@ -128,12 +129,26 @@ public class GeneratorDialog extends JDialog {
                 new Task.Backgroundable(project, "Generate a Set of POJOs from JSON", false) {
                     @Override
                     public void run(@NotNull ProgressIndicator indicator) {
-                        JsonToLombokPojo.newBuilder(destinationPath, packageName, indicator)
-                                .setFieldAnnotations(Set.of(setting.getFieldAnnotation()))
-                                .setClassAnnotations(setting.getClassAnnotations())
-                                .isPrimitiveFields(setting.isFieldTypePrimitive())
-                                .build()
-                                .apply(jsonTextArea.getText(), className.getText());
+                        if (setting.isLombokJsonToPojo()) {
+                            JsonToLombokPojo.newBuilder(destinationPath, packageName, indicator)
+                                    .setFieldAnnotations(Settings.getFieldAnnotation(setting))
+                                    .setClassAnnotations(Settings.getClassAnnotations(setting))
+                                    .setPrimitiveFields(setting.isUsePrimitiveTypes())
+                                    .build()
+                                    .apply(jsonTextArea.getText(), className.getText());
+                        } else {
+                            JsonToVanillaPojo.newBuilder(destinationPath, packageName, indicator)
+                                    .setFieldAnnotations(Settings.getFieldAnnotation(setting))
+                                    .setClassAnnotations(Settings.getClassAnnotations(setting))
+                                    .setPrimitiveFields(setting.isUsePrimitiveTypes())
+                                    .setCreateGetters(setting.isVanillaGetters())
+                                    .setCreateSetters(setting.isVanillaSetters())
+                                    .setCreateAllArgsConstructor(setting.isLombokAllArgsConstructor())
+                                    .setCreateNoArgsConstructor(setting.isVanillaNoArgsConstructor())
+                                    .setCreateFinalFields(setting.isVanillaUseFinalFields())
+                                    .build()
+                                    .apply(jsonTextArea.getText(), className.getText());
+                        }
                         ProjectView.getInstance(project).refresh();
                         actionFolder.refresh(false, true);
                     }

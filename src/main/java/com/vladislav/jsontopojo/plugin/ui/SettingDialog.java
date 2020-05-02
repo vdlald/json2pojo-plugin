@@ -32,7 +32,7 @@ public class SettingDialog extends JDialog {
     private JCheckBox lombokGetterOnClass;
     private JRadioButton vanillaJsonToPojo;
     private JRadioButton lombokJsonToPojo;
-    private JCheckBox useFinalFieldsCheckBox;
+    private JCheckBox vanillaUseFinalFields;
     private JPanel vanillaSettings;
     private JPanel lombokSettings;
 
@@ -63,14 +63,15 @@ public class SettingDialog extends JDialog {
     }
 
     private void bindConfig() {
-        usePrimitiveTypes.setSelected(setting.isFieldTypePrimitive());
-        annotateDeserializeFieldWith.setSelectedIndex(setting.getFieldNameAnnotation());
-
+        annotateDeserializeFieldWith.setSelectedIndex(setting.getAnnotateDeserializeFieldWith());
+        usePrimitiveTypes.setSelected(setting.isUsePrimitiveTypes());
+        vanillaJsonToPojo.setSelected(setting.isVanillaJsonToPojo());
+        lombokJsonToPojo.setSelected(setting.isLombokJsonToPojo());
         vanillaNoArgsConstructor.setSelected(setting.isVanillaNoArgsConstructor());
         vanillaAllArgsConstructor.setSelected(setting.isVanillaAllArgsConstructor());
         vanillaGetters.setSelected(setting.isVanillaGetters());
         vanillaSetters.setSelected(setting.isVanillaSetters());
-
+        vanillaUseFinalFields.setSelected(setting.isVanillaUseFinalFields());
         lombokData.setSelected(setting.isLombokData());
         lombokValue.setSelected(setting.isLombokValue());
         lombokBuilder.setSelected(setting.isLombokBuilder());
@@ -79,12 +80,21 @@ public class SettingDialog extends JDialog {
         lombokAllArgsConstructor.setSelected(setting.isLombokAllArgsConstructor());
         lombokGetter.setSelected(setting.isLombokGetter());
         lombokSetter.setSelected(setting.isLombokSetter());
-        lombokGetterOnClass.setSelected(setting.isLombokGetter());
-        lombokSetterOnClass.setSelected(setting.isLombokSetter());
+        lombokGetterOnClass.setSelected(setting.isLombokGetterOnClass());
+        lombokSetterOnClass.setSelected(setting.isLombokSetterOnClass());
     }
 
     private void onOK() {
-        setting.setLombokData(lombokData.isSelected())
+        setting.setAnnotateDeserializeFieldWith(annotateDeserializeFieldWith.getSelectedIndex())
+                .setUsePrimitiveTypes(usePrimitiveTypes.isSelected())
+                .setVanillaJsonToPojo(vanillaJsonToPojo.isSelected())
+                .setLombokJsonToPojo(lombokJsonToPojo.isSelected())
+                .setVanillaNoArgsConstructor(vanillaNoArgsConstructor.isSelected())
+                .setVanillaAllArgsConstructor(vanillaAllArgsConstructor.isSelected())
+                .setVanillaGetters(vanillaGetters.isSelected())
+                .setVanillaSetters(vanillaSetters.isSelected())
+                .setVanillaUseFinalFields(vanillaUseFinalFields.isSelected())
+                .setLombokData(lombokData.isSelected())
                 .setLombokValue(lombokValue.isSelected())
                 .setLombokBuilder(lombokBuilder.isSelected())
                 .setLombokNoArgsConstructor(lombokNoArgsConstructor.isSelected())
@@ -92,15 +102,8 @@ public class SettingDialog extends JDialog {
                 .setLombokAllArgsConstructor(lombokAllArgsConstructor.isSelected())
                 .setLombokGetter(lombokGetter.isSelected())
                 .setLombokSetter(lombokSetter.isSelected())
-                .setLombokSetterOnClass(lombokSetterOnClass.isSelected())
                 .setLombokGetterOnClass(lombokGetterOnClass.isSelected())
-                .setFieldTypePrimitive(usePrimitiveTypes.isSelected())
-                .setFieldNameAnnotation(annotateDeserializeFieldWith.getSelectedIndex())
-                .setVanillaAllArgsConstructor(vanillaAllArgsConstructor.isSelected())
-                .setVanillaNoArgsConstructor(vanillaNoArgsConstructor.isSelected())
-                .setVanillaGetters(vanillaGetters.isSelected())
-                .setVanillaSetters(vanillaSetters.isSelected())
-                .save();
+                .setLombokSetterOnClass(lombokSetterOnClass.isSelected());
         dispose();
     }
 

@@ -38,6 +38,7 @@ public abstract class AbstractJsonToPojo {
             FieldFactory fieldFactory,
             String packageName,
             String destinationPath,
+            int fieldMods,
             JCodeModel model
     ) {
         this.classAnnotations = classAnnotations;
@@ -45,6 +46,7 @@ public abstract class AbstractJsonToPojo {
         this.fieldFactory = fieldFactory;
         this.packageName = packageName;
         this.destinationPath = destinationPath;
+        this.fieldMods = fieldMods;
         this.codeModel = model;
         stringRef = codeModel.ref(String.class);
         objectRef = codeModel.ref(Object.class);
@@ -52,7 +54,6 @@ public abstract class AbstractJsonToPojo {
         integerRef = codeModel.ref(Integer.class);
         longRef = codeModel.ref(Long.class);
         doubleRef = codeModel.ref(Double.class);
-        fieldMods = JMod.PRIVATE;
     }
 
     public void apply(@NonNull String json, @NonNull String className) {
