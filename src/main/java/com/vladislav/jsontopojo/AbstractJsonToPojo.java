@@ -33,6 +33,8 @@ public abstract class AbstractJsonToPojo {
     private final JClass integerRef;
     private final JClass longRef;
     private final JClass doubleRef;
+    private final JClass listRef;
+    private final JClass objectListRef;
 
     public AbstractJsonToPojo(
             Set<Class<? extends Annotation>> classAnnotations,
@@ -58,6 +60,8 @@ public abstract class AbstractJsonToPojo {
         integerRef = codeModel.ref(Integer.class);
         longRef = codeModel.ref(Long.class);
         doubleRef = codeModel.ref(Double.class);
+        listRef = codeModel.ref(List.class);
+        objectListRef = listRef.narrow(objectRef);
     }
 
     public void apply(@NonNull String json, @NonNull String className) {
@@ -73,7 +77,7 @@ public abstract class AbstractJsonToPojo {
         }
     }
 
-    private JDefinedClass parseObjectToClass(JsonObject jsonObject, String className) throws Exception {
+    private JDefinedClass parseObjectToClass(JsonObject jsonObject, String className) throws JClassAlreadyExistsException {
         JDefinedClass clazz;
 
         clazz = jPackage._class(formatClassName(className));
@@ -97,8 +101,11 @@ public abstract class AbstractJsonToPojo {
                     e.printStackTrace();
                 }
             } else if (value.isJsonArray()) {
-                final JType typeOfJsonArray = getTypeOfJsonArray(value.getAsJsonArray());
-                createField(clazz, codeModel.ref(List.class).narrow(typeOfJsonArray), fieldName);
+                try {
+                    parseArrayToField(value.getAsJsonArray(), fieldName, clazz);
+                } catch (JClassAlreadyExistsException e) {
+                    e.printStackTrace();
+                }
             } else {
                 createField(clazz, objectRef, fieldName);
             }
@@ -108,16 +115,17 @@ public abstract class AbstractJsonToPojo {
     }
 
     // region Work with Fields
-    private void createField(JDefinedClass clazz, JClass ref, String name) {
+    private JFieldVar createField(JDefinedClass clazz, JClass ref, String name) {
         final String formatName = formatFieldName(name);
         final JFieldVar field = clazz.field(fieldMods, ref, formatName);
         if (!formatName.equals(name)) {
             field.annotate(deserializeAnnotation).param("value", name);
         }
         fieldAnnotations.forEach(field::annotate);
+        return field;
     }
 
-    private void createPrimitiveField(JDefinedClass clazz, String name, JsonPrimitive primitive) {
+    private JFieldVar createPrimitiveField(JDefinedClass clazz, String name, JsonPrimitive primitive) {
         final JFieldVar field = fieldFactory.createPrimitiveField(
                 clazz,
                 fieldMods,
@@ -125,6 +133,7 @@ public abstract class AbstractJsonToPojo {
                 primitive
         );
         fieldAnnotations.forEach(field::annotate);
+        return field;
     }
 
     private static String formatFieldName(String name) {
@@ -133,7 +142,7 @@ public abstract class AbstractJsonToPojo {
     // endregion
 
     // region Work with JsonArray
-    private JType getTypeOfJsonArray(JsonArray array) {
+    private JFieldVar parseArrayToField(JsonArray array, String fieldName, JDefinedClass clazz) throws JClassAlreadyExistsException {
         JsonElement jsonElement;
         int i = 0;
         do {
@@ -141,74 +150,46 @@ public abstract class AbstractJsonToPojo {
             i++;
         } while (jsonElement.isJsonNull() && i < array.size());
         if (i == array.size() && jsonElement.isJsonNull()) {
-            return objectRef;
-        } else if (i == array.size()) {
-            return getTypeOfJsonArrayElement(jsonElement);
-        } else {
-            Set<JType> types = new HashSet<>();
-            types.add(getTypeOfJsonArrayElement(jsonElement));
-            for (; i < array.size(); i++)
-                types.add(getTypeOfJsonArrayElement(array.get(i)));
-            final JType[] typesArray = types.toArray(new JType[0]);
-            if (typesArray.length == 1)
-                return typesArray[0];
-            else {
-                boolean containInteger = false;
-                boolean containDouble = false;
-                boolean containLong = false;
-                boolean containString = false;
-                boolean containBoolean = false;
-                boolean containList = false;
-                for (JType jType : typesArray) {
-                    if (jType == objectRef)
-                        return objectRef;
-                    else if (jType.isArray())
-                        containList = true;
-                    else if (jType == stringRef)
-                        containString = true;
-                    else if (jType == booleanRef)
-                        containBoolean = true;
-                    else if (jType == doubleRef)
-                        containDouble = true;
-                    else if (jType == integerRef)
-                        containInteger = true;
-                    else if (jType == longRef)
-                        containLong = true;
-                }
-                boolean containNumber = containInteger || containDouble || containLong;
-                boolean mixedType =
-                        (containString && (containNumber || containList || containBoolean)) ||
-                                (containList && (containNumber || containBoolean)) ||
-                                (containNumber && containBoolean);
-                if (mixedType) {
-                    return objectRef;
-                } else if (containString) {
-                    return stringRef;
-                } else if (containList) {
-                    for (JType jType : typesArray)
-                        if (jType.isArray())
-                            return jType;
-                } else if (containNumber) {
-                    if (containDouble) {
-                        return doubleRef;
-                    } else if (containLong) {
-                        return longRef;
-                    } else {
-                        return integerRef;
-                    }
+            return createField(clazz, objectListRef, fieldName);
+        }
+        if (jsonElement.isJsonPrimitive()) {
+            for (int j = i + 1; j < array.size(); j++) {
+                final JsonElement element = array.get(j);
+                if (element.isJsonNull()) continue;
+                if (!array.get(j).isJsonPrimitive()) {
+                    return createField(clazz, objectListRef, fieldName);
                 }
             }
+            return createField(
+                    clazz,
+                    listRef.narrow(getTypeOfJsonArrayPrimitive(jsonElement.getAsJsonPrimitive())),
+                    fieldName
+            );
+        } else if (jsonElement.isJsonObject()) {
+            for (int j = i + 1; j < array.size(); j++) {
+                final JsonElement element = array.get(j);
+                if (element.isJsonNull()) continue;
+                if (!array.get(j).isJsonObject()) {
+                    return createField(clazz, objectListRef, fieldName);
+                }
+            }
+            final JsonObject jsonObject = jsonElement.getAsJsonObject();
+            for (int j = i + 1; j < array.size(); j++) {
+                final JsonElement element = array.get(j);
+                if (element.isJsonNull()) continue;
+                final JsonObject object = element.getAsJsonObject();
+                if (!object.keySet().equals(jsonObject.keySet()))
+                    return createField(clazz, objectListRef, fieldName);
+            }
+            return createField(
+                    clazz,
+                    listRef.narrow(parseObjectToClass(jsonObject, clazz.name() + formatClassName(fieldName))),
+                    fieldName
+            );
+        } else if (jsonElement.isJsonArray()) {
+            throw new RuntimeException();
         }
-        return objectRef;
-    }
-
-    private JType getTypeOfJsonArrayElement(JsonElement element) {
-        if (element.isJsonPrimitive())
-            return getTypeOfJsonArrayPrimitive(element.getAsJsonPrimitive());
-        else if (element.isJsonArray())
-            return codeModel.ref(List.class).narrow(getTypeOfJsonArray(element.getAsJsonArray()));
-        else
-            return objectRef;  // todo: bug, parse object
+        return createField(clazz, objectListRef, fieldName);
     }
 
     private JType getTypeOfJsonArrayPrimitive(JsonPrimitive primitive) {
