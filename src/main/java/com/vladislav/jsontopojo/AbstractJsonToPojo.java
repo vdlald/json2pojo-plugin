@@ -65,7 +65,7 @@ public abstract class AbstractJsonToPojo {
         classes = new HashSet<>();
         jPackage = codeModel._package(packageName);
         try {
-            parseObject(jsonElement.getAsJsonObject(), className);
+            parseObjectToClass(jsonElement.getAsJsonObject(), className);
             codeModel.build(new File(destinationPath));
             classes.forEach(jPackage::remove);
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public abstract class AbstractJsonToPojo {
         }
     }
 
-    private JDefinedClass parseObject(JsonObject jsonObject, String className) throws Exception {
+    private JDefinedClass parseObjectToClass(JsonObject jsonObject, String className) throws Exception {
         JDefinedClass clazz;
 
         clazz = jPackage._class(formatClassName(className));
@@ -81,24 +81,24 @@ public abstract class AbstractJsonToPojo {
         classes.add(clazz);
 
         jsonObject.entrySet().forEach(entry -> {
-            final String key = entry.getKey();
+            final String fieldName = entry.getKey();
             final JsonElement value = entry.getValue();
 
             if (value.isJsonPrimitive()) {
-                createPrimitiveField(clazz, key, value.getAsJsonPrimitive());
+                createPrimitiveField(clazz, fieldName, value.getAsJsonPrimitive());
             } else if (value.isJsonObject()) {
                 try {
                     createField(
                             clazz,
-                            parseObject(value.getAsJsonObject(), className + formatClassName(key)),
-                            key
+                            parseObjectToClass(value.getAsJsonObject(), className + formatClassName(fieldName)),
+                            fieldName
                     );
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else if (value.isJsonArray()) {
                 final JType typeOfJsonArray = getTypeOfJsonArray(value.getAsJsonArray());
-                createField(clazz, codeModel.ref(List.class).narrow(typeOfJsonArray), key);
+                createField(clazz, codeModel.ref(List.class).narrow(typeOfJsonArray), fieldName);
             } else {
                 // todo: isJsonNull
             }
