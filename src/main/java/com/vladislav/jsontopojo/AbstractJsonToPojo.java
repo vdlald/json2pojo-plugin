@@ -100,7 +100,7 @@ public abstract class AbstractJsonToPojo {
                 final JType typeOfJsonArray = getTypeOfJsonArray(value.getAsJsonArray());
                 createField(clazz, codeModel.ref(List.class).narrow(typeOfJsonArray), fieldName);
             } else {
-                // todo: isJsonNull
+                createField(clazz, objectRef, fieldName);
             }
         });
         afterClassCreation(clazz);
