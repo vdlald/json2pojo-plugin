@@ -3,6 +3,7 @@ package com.vladislav.jsontopojo;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
+import com.sun.codemodel.JMod;
 import com.vladislav.jsontopojo.factories.ClassFieldFactory;
 import com.vladislav.jsontopojo.factories.FieldFactory;
 import com.vladislav.jsontopojo.factories.PrimitiveFieldFactory;
@@ -18,9 +19,11 @@ public class JsonToLombokPojo extends AbstractJsonToPojo {
         super(
                 builder.classAnnotations,
                 builder.fieldAnnotations,
+                builder.deserializeAnnotation,
                 builder.fieldFactory,
                 builder.packageName,
                 builder.destinationPath,
+                JMod.PRIVATE,
                 builder.model
         );
     }
@@ -48,6 +51,7 @@ public class JsonToLombokPojo extends AbstractJsonToPojo {
         private Set<Class<? extends Annotation>> fieldAnnotations;
         private Set<Class<? extends Annotation>> classAnnotations;
         private FieldFactory fieldFactory;
+        private Class<? extends Annotation> deserializeAnnotation;
 
         Builder(
                 @NonNull String destinationPath,
@@ -61,10 +65,16 @@ public class JsonToLombokPojo extends AbstractJsonToPojo {
             fieldFactory = new ClassFieldFactory(model);
             fieldAnnotations = new HashSet<>();
             classAnnotations = new HashSet<>();
+            deserializeAnnotation = null;
         }
 
         public Builder setFieldAnnotations(Set<Class<? extends Annotation>> fieldAnnotations) {
             this.fieldAnnotations = fieldAnnotations;
+            return this;
+        }
+
+        public Builder setDeserializeAnnotation(Class<? extends Annotation> deserializeAnnotation) {
+            this.deserializeAnnotation = deserializeAnnotation;
             return this;
         }
 
@@ -73,7 +83,7 @@ public class JsonToLombokPojo extends AbstractJsonToPojo {
             return this;
         }
 
-        public Builder isPrimitiveFields(boolean isPrimitive) {
+        public Builder setPrimitiveFields(boolean isPrimitive) {
             if (isPrimitive) {
                 fieldFactory = new PrimitiveFieldFactory(model);
             } else {

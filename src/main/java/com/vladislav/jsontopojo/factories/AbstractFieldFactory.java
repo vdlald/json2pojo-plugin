@@ -4,7 +4,6 @@ import com.google.gson.JsonPrimitive;
 import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JFieldVar;
-import com.sun.codemodel.JMod;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

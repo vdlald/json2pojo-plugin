@@ -1,43 +1,42 @@
 package com.vladislav.jsontopojo.plugin;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.annotations.SerializedName;
-import lombok.*;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.*;
-import java.lang.annotation.Annotation;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
 
 @Data
 @Accessors(chain = true)
 public class Setting implements Serializable {
 
     private static volatile Setting instance;
-    private static String SAVE_PATH = System.getProperty("user.home") + "/.jsonToPojo";
+    private static final Path path = Paths.get(System.getProperty("user.home") + "/.jsonToPojo");
     private static String SETTINGS_FILENAME = "settings.out";
 
-    private boolean fieldTypePrimitive = false;
-    private int fieldNameAnnotation = 0;
+    private int annotateDeserializeFieldWith = 0;
+    private boolean usePrimitiveTypes = false;
+    private boolean vanillaJsonToPojo = false;
+    private boolean lombokJsonToPojo = true;
 
-    private boolean vanillaNoArgsConstructor;
-    private boolean vanillaAllArgsConstructor;
-    private boolean vanillaGetters;
-    private boolean vanillaSetters;
+    private boolean vanillaNoArgsConstructor = true;
+    private boolean vanillaAllArgsConstructor = true;
+    private boolean vanillaGetters = true;
+    private boolean vanillaSetters = true;
+    private boolean vanillaUseFinalFields = false;
 
     private boolean lombokData = true;
     private boolean lombokValue = false;
     private boolean lombokBuilder = false;
-    private boolean lombokNoArgsConstructor = false;
-    private boolean lombokRequiredArgsConstructor = true;
-    private boolean lombokAllArgsConstructor = false;
+    private boolean lombokNoArgsConstructor = true;
+    private boolean lombokRequiredArgsConstructor = false;
+    private boolean lombokAllArgsConstructor = true;
     private boolean lombokGetter = false;
     private boolean lombokSetter = false;
-    private boolean lombokSetterOnClass = true;
-    private boolean lombokGetterOnClass = true;
+    private boolean lombokSetterOnClass = false;
+    private boolean lombokGetterOnClass = false;
 
     private int windowWidth = 500;
     private int windowHeight = 450;
@@ -45,8 +44,6 @@ public class Setting implements Serializable {
     private int windowY = 100;
 
     public void save() {
-        final Path path = Paths.get(SAVE_PATH);
-
         try {
             Files.createDirectory(path);
         } catch (IOException ignored) {
@@ -62,8 +59,6 @@ public class Setting implements Serializable {
     }
 
     private static Setting restore() {
-        final Path path = Paths.get(SAVE_PATH);
-
         try (ObjectInputStream inputStream = new ObjectInputStream(
                 new FileInputStream(path + "/" + SETTINGS_FILENAME)
         )) {
@@ -71,26 +66,6 @@ public class Setting implements Serializable {
         } catch (IOException | ClassNotFoundException ignored) {
         }
         return new Setting();
-    }
-
-    public Class<? extends Annotation> getFieldAnnotation() {
-        return new ArrayList<Class<? extends Annotation>>() {{
-            add(null);
-            add(SerializedName.class);
-            add(JsonProperty.class);
-        }}.get(this.fieldNameAnnotation);
-    }
-
-    public Set<Class<? extends Annotation>> getClassAnnotations() {
-        Set<Class<? extends Annotation>> annotations = new HashSet<>() {{
-            if (lombokData) add(Data.class);
-            if (lombokValue) add(Value.class);
-            if (lombokBuilder) add(Builder.class);
-            if (lombokNoArgsConstructor) add(NoArgsConstructor.class);
-            if (lombokRequiredArgsConstructor) add(RequiredArgsConstructor.class);
-            if (lombokAllArgsConstructor) add(AllArgsConstructor.class);
-        }};
-        return Collections.unmodifiableSet(annotations);
     }
 
     public static Setting getInstance() {
@@ -104,5 +79,17 @@ public class Setting implements Serializable {
             }
         }
         return localInstance;
+    }
+
+    public Setting setVanillaJsonToPojo(boolean vanillaJsonToPojo) {
+        lombokJsonToPojo = !vanillaJsonToPojo;
+        this.vanillaJsonToPojo = vanillaJsonToPojo;
+        return this;
+    }
+
+    public Setting setLombokJsonToPojo(boolean lombokJsonToPojo) {
+        vanillaJsonToPojo = !lombokJsonToPojo;
+        this.lombokJsonToPojo = lombokJsonToPojo;
+        return this;
     }
 }
