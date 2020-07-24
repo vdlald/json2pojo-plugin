@@ -4,18 +4,19 @@ plugins {
 }
 
 group 'com.vladislav'
-version '1.0-SNAPSHOT'
+version '1.2-SNAPSHOT'
 sourceCompatibility = 11
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
-    implementation 'com.google.code.gson:gson:2.8.6'
+    compile 'com.google.code.gson:gson:2.8.6'
     compile 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
-    compile "com.sun.codemodel:codemodel:2.6"
+    compile "com.vladislav:json2pojo:2.0-SHANPSHOT-BETA12"
 
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'

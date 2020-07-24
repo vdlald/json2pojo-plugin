@@ -1,4 +1,4 @@
-package com.vladislav.jsontopojo.plugin;
+package com.vladislav.jsontopojo;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -16,7 +16,13 @@ public class Setting implements Serializable {
     private static final Path path = Paths.get(System.getProperty("user.home") + "/.jsonToPojo");
     private static String SETTINGS_FILENAME = "settings.out";
 
-    private int annotateDeserializeFieldWith = 0;
+    private boolean cyrillicToLatin = false;
+    private boolean suppressUnused = true;
+    private boolean useLongIntegers = false;
+    private boolean useDoubleNumbers = false;
+    private boolean addAdditionalProperties = false;
+
+    private DeserializeAnnotation annotateDeserializeFieldWith = DeserializeAnnotation.JSON_PROPERTY;
     private boolean usePrimitiveTypes = false;
     private boolean vanillaJsonToPojo = false;
     private boolean lombokJsonToPojo = true;
@@ -26,6 +32,9 @@ public class Setting implements Serializable {
     private boolean vanillaGetters = true;
     private boolean vanillaSetters = true;
     private boolean vanillaUseFinalFields = false;
+    private boolean vanillaHashCode = true;
+    private boolean vanillaEquals = true;
+    private boolean vanillaToString = true;
 
     private boolean lombokData = true;
     private boolean lombokValue = false;
@@ -37,6 +46,7 @@ public class Setting implements Serializable {
     private boolean lombokSetter = false;
     private boolean lombokSetterOnClass = false;
     private boolean lombokGetterOnClass = false;
+    private boolean lombokEqualsAndHashCode = false;
 
     private int windowWidth = 500;
     private int windowHeight = 450;

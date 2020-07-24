@@ -1,11 +1,11 @@
-package com.vladislav.jsontopojo.plugin.actions;
+package com.vladislav.jsontopojo.actions;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.vladislav.jsontopojo.plugin.ui.GeneratorDialog;
+import com.vladislav.jsontopojo.ui.GeneratorDialog;
 import org.jetbrains.annotations.NotNull;
 
 public class GenerateAction extends com.intellij.openapi.actionSystem.AnAction {

@@ -3,7 +3,6 @@ package com.vladislav.jsontopojo;
 import com.google.gson.JsonParser;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
-import org.apache.commons.lang.WordUtils;
 
 @UtilityClass
 public class Utils {
@@ -20,23 +19,22 @@ public class Utils {
         return className.matches("[A-Za-z][a-zA-Z0-9]*");
     }
 
-    public String toCamelCase(String string, boolean firstWordToLowerCase) {
-        boolean isPrevLowerCase = false, isNextUpperCase = !firstWordToLowerCase;
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < string.length(); i++) {
-            char currentChar = string.charAt(i);
-            if (!Character.isLetterOrDigit(currentChar)) {
-                isNextUpperCase = result.length() > 0 || isNextUpperCase;
-            } else {
-                result.append(
-                        isNextUpperCase ? Character.toUpperCase(currentChar) :
-                                isPrevLowerCase ? currentChar : Character.toLowerCase(currentChar)
-                );
-                isNextUpperCase = false;
+    public String firstLetterToUpperCase(String string) {
+        return string.substring(0, 1).toUpperCase() + string.substring(1);
+    }
+
+    public String cyrillicToLatin(String message) {
+        char[] abcCyr = {' ', 'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+        String[] abcLat = {" ", "a", "b", "v", "g", "d", "e", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "ts", "ch", "sh", "sch", "", "i", "", "e", "ju", "ja", "A", "B", "V", "G", "D", "E", "E", "Zh", "Z", "I", "Y", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "F", "H", "Ts", "Ch", "Sh", "Sch", "", "I", "", "E", "Ju", "Ja", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < message.length(); i++) {
+            for (int x = 0; x < abcCyr.length; x++) {
+                if (message.charAt(i) == abcCyr[x]) {
+                    builder.append(abcLat[x]);
+                }
             }
-            isPrevLowerCase = result.length() > 0 && Character.isLowerCase(currentChar);
         }
-        return result.toString();
+        return builder.toString();
     }
 
 }

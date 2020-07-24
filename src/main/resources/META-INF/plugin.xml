@@ -2,9 +2,9 @@
     <id>com.vladislav.jsontopojo</id>
     <name>JsonToPojo</name>
     <version>1.0</version>
-<!--    <vendor email="vlad.vdlald@gmail.com" url="http://www.yourcompany.com">YourCompany</vendor>-->
+    <vendor email="vlad.vdlald@gmail.com" url="https://github.com/vdlald/json2pojo-plugin">Vladislav Golubinov</vendor>
 
-    <description>Plugin description</description>
+    <description>Allows in one click to generate POJO from JSON</description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
@@ -17,7 +17,7 @@
     <actions>
         <action
                 id="com.vladislav.jsontopojo"
-                class="com.vladislav.jsontopojo.plugin.actions.GenerateAction"
+                class="com.vladislav.jsontopojo.actions.GenerateAction"
                 text="Generate a Set of POJOs from JSON"
                 description="Convert JSON to POJOs"
                 icon="/icons/json.png"
