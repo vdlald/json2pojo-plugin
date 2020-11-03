@@ -1,14 +1,18 @@
 <idea-plugin>
     <id>com.vladislav.jsontopojo</id>
     <name>JsonToPojo</name>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <vendor email="vlad.vdlald@gmail.com" url="https://github.com/vdlald/json2pojo-plugin">Vladislav Golubinov</vendor>
 
-    <description>Allows in one click to generate POJO from JSON</description>
+    <description>
+        Allows in one click to generate POJO from JSON.
+        To use this plugin, right click on the package and click Generate a set ...
+    </description>
 
     <!-- please see https://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
+    <incompatible-with>com.intellij.modules.androidstudio</incompatible-with>
     <idea-version since-build="193"/>
 
     <extensions defaultExtensionNs="com.intellij">

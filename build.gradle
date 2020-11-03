@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'com.vladislav'
-version '1.2.1-SNAPSHOT'
+version '1.2.2-SNAPSHOT'
 sourceCompatibility = 11
 
 repositories {
@@ -29,6 +29,6 @@ intellij {
 }
 patchPluginXml {
     changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+    The plugin is compatible since 193 builds.
+    """
 }
