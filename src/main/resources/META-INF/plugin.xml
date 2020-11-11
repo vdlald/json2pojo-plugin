@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.vladislav.jsontopojo</id>
     <name>JsonToPojo</name>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <vendor email="vlad.vdlald@gmail.com" url="https://github.com/vdlald/json2pojo-plugin">Vladislav Golubinov</vendor>
 
     <description>
